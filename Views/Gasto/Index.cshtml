@@ -1,0 +1,108 @@
+﻿@model IEnumerable<TheConsortiumApp.Models.Gasto>
+
+@{
+    ViewData["Title"] = "Gastos";
+}
+
+<h2>Gastos</h2>
+
+<!-- ✅ FILTROS (GET) -->
+<form method="get" class="row mb-3">
+    <div class="col-md-4">
+        <label>Consorcio</label>
+        <select name="consorcioId" class="form-control">
+              Todos los consorcios
+                @foreach (var c in ViewBag.Consorcios)
+                {
+                    if (c.Id == ViewBag.ConsorcioIdSeleccionado)
+                    {
+                        <option value="@c.Id" selected>@c.Nombre</option>
+                    }
+                    else
+                    {
+                        <option value="@c.Id">@c.Nombre</option>
+                    }
+                }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label>Año</label>
+        <input type="number" name="year" value="@ViewBag.Year" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label>Mes</label>
+        <input type="number" name="month" value="@ViewBag.Month" class="form-control" min="1" max="12" />
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-success w-100">Filtrar</button>
+    </div>
+</form>
+
+<!-- ✅ BOTONES -->
+<div class="d-flex gap-2 mb-3">
+    <a asp-action="Create" class="btn btn-primary">
+        + Nuevo Gasto
+    </a>
+
+    <!-- ✅ EXPORT PDF -->
+    <a class="btn btn-outline-danger"
+       asp-action="ExportPdf"
+       asp-route-consorcioId="@ViewBag.ConsorcioIdSeleccionado"
+       asp-route-year="@ViewBag.Year"
+       asp-route-month="@ViewBag.Month">
+        Exportar PDF
+    </a>
+</div>
+
+<!-- ✅ TOTAL ARRIBA -->
+<div class="alert alert-info">
+    <strong>Periodo:</strong> @($"{ViewBag.Year}-{((int)ViewBag.Month):D2}") |
+    <strong>Total gastos:</strong> $@($"{ViewBag.TotalGastos:0.00}")
+</div>
+
+<!-- ✅ TABLA -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Concepto</th>
+            <th>Categoría</th>
+            <th>Monto</th>
+            <th>Fecha</th>
+            <th>Consorcio</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var g in Model)
+            {
+                <tr>
+                    <td>@g.Concepto</td>
+                    <td>@g.Categoria</td>
+                    <td>$@g.Monto</td>
+                    <td>@g.FechaRegistro.ToShortDateString()</td>
+                    <td>@g.Consorcio?.Nombre</td>
+
+                    <td>
+                        <a asp-action="Delete" asp-route-id="@g.Id"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('¿Eliminar gasto?');">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No hay gastos para los filtros seleccionados.</td>
+            </tr>
+        }
+    </tbody>
+</table>

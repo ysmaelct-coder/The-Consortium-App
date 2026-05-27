@@ -1,0 +1,38 @@
+﻿@model IEnumerable<TheConsortiumApp.Models.UnidadFuncional>
+
+<h2>Unidades Funcionales</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">
+    + Nueva Unidad
+</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Unidad</th>
+            <th>Piso / Depto</th>
+            <th>Coeficiente</th>
+            <th>Propietario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.NroUnidad</td>
+                <td>@u.PisoDepto</td>
+                <td>@u.Coeficiente</td>
+                <td>@u.Propietario</td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@u.Id"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Seguro que querés eliminar esta unidad?');">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

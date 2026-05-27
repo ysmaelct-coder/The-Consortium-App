@@ -1,0 +1,76 @@
+﻿@model TheConsortiumApp.Models.UnidadFuncional
+
+@{
+    ViewData["Title"] = "Nueva Unidad Funcional";
+}
+
+<h2>Nueva Unidad Funcional</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="NroUnidad" class="form-label"></label>
+        <input asp-for="NroUnidad" class="form-control" />
+        <span asp-validation-for="NroUnidad" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PisoDepto" class="form-label"></label>
+        <input asp-for="PisoDepto" class="form-control" />
+        <span asp-validation-for="PisoDepto" class="text-danger"></span>
+    </div>
+
+    <!-- ✅ AMBIENTES COMO DESPLEGABLE -->
+    <div class="mb-3">
+        <label class="form-label">Cantidad de ambientes</label>
+        <select asp-for="Ambientes" class="form-control">
+            <option value="">Seleccione...</option>
+            <option value="Monoambiente">Monoambiente</option>
+            <option value="DosAmbientes">2 ambientes</option>
+            <option value="TresAmbientes">3 ambientes</option>
+        </select>
+        <span asp-validation-for="Ambientes" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Propietario" class="form-label"></label>
+        <input asp-for="Propietario" class="form-control" />
+        <span asp-validation-for="Propietario" class="text-danger"></span>
+    </div>
+
+    <!-- ✅ CONSORCIO COMO DESPLEGABLE -->
+    <div class="mb-3">
+        <label class="form-label">Edificio / Consorcio</label>
+        <select asp-for="ConsorcioId" class="form-control">
+            <option value="">Seleccione un consorcio</option>
+
+            @foreach (var c in ViewBag.Consorcios)
+            {
+                <option value="@c.Id">@c.Nombre</option>
+            }
+        </select>
+        <span asp-validation-for="ConsorcioId" class="text-danger"></span>
+    </div>
+
+    <!-- ✅ EXPLICACIÓN (REEMPLAZA COEFICIENTE) -->
+    <div class="mb-3">
+        <label class="form-label">Participación en gastos</label>
+        <input class="form-control"
+               value="Se calcula automáticamente según ambientes y el total del edificio"
+               disabled />
+        <small class="text-muted">
+            Ejemplo: unidades más grandes pagan mayor porcentaje del gasto mensual.
+        </small>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    <div asp-validation-summary="All" class="text-danger"></div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

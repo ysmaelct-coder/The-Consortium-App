@@ -1,0 +1,100 @@
+﻿@model IEnumerable<TheConsortiumApp.Models.LiquidacionExpensaDetalle>
+
+@{
+    ViewData["Title"] = "Reportes";
+}
+
+<h2>Reporte de Expensas</h2>
+
+<!-- ✅ FILTRO -->
+<form method="get" class="row mb-3">
+    <div class="col-md-4">
+        <label>Consorcio</label>
+        <select name="consorcioId" class="form-control">
+            @foreach (var c in ViewBag.Consorcios)
+            {
+                <option value="@c.Id" selected="@(c.Id == ViewBag.ConsorcioIdSeleccionado)">
+                    @c.Nombre
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label>Año</label>
+        <input type="number" name="year" value="@ViewBag.Year" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label>Mes</label>
+        <input type="number" name="month" value="@ViewBag.Month" class="form-control" />
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-success w-100">Filtrar</button>
+    </div>
+</form>
+
+<!-- ✅ GENERAR -->
+<form asp-action="Generar" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="consorcioId" value="@ViewBag.ConsorcioIdSeleccionado" />
+    <input type="hidden" name="year" value="@ViewBag.Year" />
+    <input type="hidden" name="month" value="@ViewBag.Month" />
+
+    <button class="btn btn-primary">
+        Generar Expensas
+    </button>
+</form>
+
+<!-- ✅ INFO -->
+<div class="alert alert-info">
+    <strong>Periodo:</strong> @(ViewBag.Periodo.ToString().Insert(4, "-")) |
+    <strong>Total gastos:</strong> $@ViewBag.TotalGastos
+</div>
+
+<!-- ✅ TABLA -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Unidad</th>
+            <th>Propietario</th>
+            <th>%</th>
+            <th>Monto</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>@d.UnidadFuncional?.Propietario</td>
+                <td>@(d.Coeficiente * 100)%</td>
+                <td>$@d.MontoCalculado</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- ✅ HISTÓRICO -->
+<h4>Histórico</h4>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Periodo</th>
+            <th>Total gastos</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var h in ViewBag.Historico ?? new List<dynamic>())
+        {
+            <tr>
+                <td>@(h.Periodo.ToString().Insert(4, "-"))</td>
+                <td>$@h.TotalGastos</td>
+            </tr>
+        }
+    </tbody>
+</table>

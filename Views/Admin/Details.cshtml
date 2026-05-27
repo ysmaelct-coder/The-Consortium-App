@@ -1,0 +1,40 @@
+﻿@model TheConsortiumApp.Models.Empresa
+
+<h2>Detalle de Empresa</h2>
+
+<div class="mb-3">
+    <strong>Email:</strong> @Model.Email <br />
+    <strong>Razón Social:</strong> @Model.RazonSocial <br />
+    <strong>CUIT:</strong> @Model.Cuit
+</div>
+
+<hr />
+
+<h4>Consorcios</h4>
+
+@if (Model.Consorcios.Any())
+{
+    @foreach (var c in Model.Consorcios)
+    {
+        <div class="card mb-3 p-3">
+            <h5>@c.Nombre</h5>
+
+            <p><strong>Dirección:</strong> @c.Direccion</p>
+
+            <p><strong>Total unidades:</strong> @c.UnidadesFuncionales.Count</p>
+
+            <p>
+                <strong>Total gastos:</strong>
+                $@c.Gastos.Sum(g => g.Monto)
+            </p>
+        </div>
+    }
+}
+else
+{
+    <p class="text-muted">Esta empresa no tiene consorcios.</p>
+}
+
+<a asp-action="Index" class="btn btn-secondary">
+    Volver
+</a>

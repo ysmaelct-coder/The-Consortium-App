@@ -1,0 +1,43 @@
+﻿@model TheConsortiumApp.Models.Empresa
+@{
+    ViewData["Title"] = "Registro";
+}
+
+<h2>Registro de Empresa Administradora</h2>
+
+<form asp-action="Register" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="RazonSocial" class="form-label"></label>
+        <input asp-for="RazonSocial" class="form-control" />
+        <span asp-validation-for="RazonSocial" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Cuit" class="form-label"></label>
+        <input asp-for="Cuit" class="form-control" />
+        <span asp-validation-for="Cuit" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input name="password" type="password" class="form-control" />
+        <span class="text-danger">@Html.ValidationMessage("Password")</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+    <a asp-action="Login" class="btn btn-link">Ya tengo cuenta</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,57 @@
+﻿@model TheConsortiumApp.Models.Consorcio
+
+@{
+    ViewData["Title"] = "Dar de Alta Consorcio";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded">
+                <div class="card-header bg-primary text-white p-3">
+                    <h3 class="card-title m-0 font-weight-bold">Configuración Inicial del Consorcio</h3>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Complete los datos geográficos y estructurales del edificio o condominio para habilitar las liquidaciones y reportes.</p>
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Nombre" class="form-label font-weight-bold">Nombre del Edificio / Condominio</label>
+                            <input asp-for="Nombre" class="form-control" placeholder="Ej: Torre Alvear, Complejo San Martín" required />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Direccion" class="form-label font-weight-bold">Dirección Física Exacta</label>
+                            <input asp-for="Direccion" class="form-control" placeholder="Ej: Av. Santa Fe 1420" required />
+                            <span asp-validation-for="Direccion" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Localidad" class="form-label font-weight-bold">Localidad / Barrio</label>
+                            <input asp-for="Localidad" class="form-control" placeholder="Ej: Palermo, CABA" required />
+                            <span asp-validation-for="Localidad" class="text-danger"></span>
+                        </div>
+
+                        <input type="hidden" asp-for="EmpresaId" value="1" />
+
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">Volver al Tablero</a>
+                            <button type="submit" class="btn btn-primary px-5 font-weight-bold">Registrar y Configurar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

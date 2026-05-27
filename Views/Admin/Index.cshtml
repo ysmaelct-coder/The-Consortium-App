@@ -1,0 +1,65 @@
+﻿@model IEnumerable<TheConsortiumApp.Models.Empresa>
+
+@{
+    ViewData["Title"] = "Panel Admin";
+}
+
+<h2>Panel de Administración</h2>
+
+<div class="alert alert-info">
+    <strong>Total de empresas:</strong> @Model.Count()
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Razón Social</th>
+            <th>CUIT</th>
+            <th>Total Consorcios</th>
+            <th>Consorcios</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var e in Model)
+        {
+            <tr>
+                <td>@e.Email</td>
+                <td>@e.RazonSocial</td>
+                <td>@e.Cuit</td>
+
+                <td>@e.Consorcios.Count</td>
+
+                <td>
+                    @if (e.Consorcios.Any())
+                    {
+                        foreach (var c in e.Consorcios)
+                        {
+                            <div>- @c.Nombre</div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin consorcios</span>
+                    }
+                </td>
+
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@e.Id"
+                       class="btn btn-info btn-sm mb-1">
+                        Ver Detalles
+                    </a>
+                    <a asp-action="Delete"
+                       asp-route-id="@e.Id"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Eliminar esta empresa?');">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
