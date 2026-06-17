@@ -1,0 +1,125 @@
+﻿@model TheConsortiumApp.Models.UnidadFuncional
+
+@{
+    ViewData["Title"] = "Gestionar Alquiler";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+
+            <h2 class="mb-4">✏️ Gestionar Alquiler de Unidad</h2>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body bg-light rounded">
+                    <h5 class="text-secondary fw-bold mb-3">📍 Datos de la Propiedad</h5>
+                    <div class="row">
+                        <div class="col-sm-6 mb-2">
+                            <strong>Unidad Nro:</strong> <span class="text-dark">@Model.NroUnidad</span>
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <strong>Piso / Depto:</strong> <span class="text-dark">@Model.PisoDepto</span>
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <strong>Ambientes:</strong> <span class="text-dark">@Model.Ambientes</span>
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <strong>Coeficiente de Expensas:</strong> <span class="badge bg-primary">@Model.Coeficiente %</span>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <strong>Propietario Legal:</strong> <span class="text-dark fw-semibold">@Model.NombrePropietario</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="NroUnidad" />
+                <input type="hidden" asp-for="PisoDepto" />
+                <input type="hidden" asp-for="Ambientes" />
+                <input type="hidden" asp-for="NombrePropietario" />
+                <input type="hidden" asp-for="ConsorcioId" />
+                <input type="hidden" asp-for="Coeficiente" />
+
+                <div class="card p-4 shadow-sm mb-4">
+
+                    <div class="form-check form-switch form-control-lg mb-4 ps-5">
+                        <input class="form-check-input" type="checkbox" id="checkAlquilada" asp-for="EstaAlquilada">
+                        <label class="form-check-label fw-bold text-dark" for="checkAlquilada">
+                            ¿Esta unidad funcional se encuentra actualmente alquilada?
+                        </label>
+                    </div>
+
+                    <div id="seccionInquilino" class="border p-4 rounded bg-white shadow-inner" style="display: none; border-style: dashed !important; border-color: #cbd5e1 !important;">
+
+                        <div class="mb-3">
+                            <label asp-for="NombreInquilino" class="form-label fw-bold">Nombre Completo del Inquilino</label>
+                            <input asp-for="NombreInquilino" class="form-control" placeholder="Ej: Juan Pérez" />
+                            <span asp-validation-for="NombreInquilino" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ArchivoInquilino" class="form-label fw-bold">Documento del Contrato (PDF o Imagen)</label>
+                            <input asp-for="ArchivoInquilino" type="file" class="form-control" accept=".pdf,image/*" />
+                            <span asp-validation-for="ArchivoInquilino" class="text-danger small"></span>
+
+                            @if (!string.IsNullOrEmpty(Model.ArchivoContrato))
+                            {
+                                <div class="mt-2 text-muted small">
+                                    <span class="text-success">✔ Documento actual guardado:</span>
+                                    <a href="~/contratos/@Model.ArchivoContrato" target="_blank" class="fw-semibold text-decoration-none text-primary">
+                                        📄 Ver Contrato Actual
+                                    </a>
+                                    <br><i class="text-secondary">(Si sube un archivo nuevo, se reemplazará el anterior automáticamente).</i>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mt-2"></div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 py-2">
+                        💾 Guardar Cambios
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary px-4 py-2">
+                        ❌ Cancelar
+                    </a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkAlquilada = document.getElementById('checkAlquilada');
+            const seccionInquilino = document.getElementById('seccionInquilino');
+
+            function controlarVisibilidadInquilino() {
+                if (checkAlquilada.checked) {
+                    // Animación sutil de despliegue si usás Bootstrap, o display plano seguro
+                    seccionInquilino.style.display = 'block';
+                } else {
+                    seccionInquilino.style.display = 'none';
+                }
+            }
+
+            // Escuchamos los clics en el switch
+            checkAlquilada.addEventListener('change', controlarVisibilidadInquilino);
+
+            // Ejecutamos al arrancar la vista por si el depto ya venía alquilado de antes
+            controlarVisibilidadInquilino();
+        });
+    </script>
+}

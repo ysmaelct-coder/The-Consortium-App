@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
 namespace TheConsortiumApp.Models
@@ -9,6 +8,11 @@ namespace TheConsortiumApp.Models
     {
         [Key]
         public int Id { get; set; }
+
+        // ✅ auditoría
+        public string? CreadoPorEmail { get; set; }
+        public DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public int CantidadDepartamentos { get; set; }
 
         [Required(ErrorMessage = "El nombre del consorcio es obligatorio")]
         [StringLength(100)]
@@ -25,10 +29,10 @@ namespace TheConsortiumApp.Models
         public int EmpresaId { get; set; }
 
         [ForeignKey("EmpresaId")]
-        public virtual Empresa? Empresa { get; set; } // Nombre normalizado para acoplamiento por convención
+        public virtual Empresa? Empresa { get; set; }
 
-        // Un Consorcio contiene muchas Unidades Funcionales (Relación 1 a Muchos)
-        public virtual ICollection<UnidadFuncional> UnidadesFuncionales { get; set; } = new List<UnidadFuncional>();
-        public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
+        // Navegaciones
+        public virtual ICollection<UnidadFuncional> UnidadesFuncionales { get; set; } = [];
+        public virtual ICollection<Gasto> Gastos { get; set; } = [];
     }
 }

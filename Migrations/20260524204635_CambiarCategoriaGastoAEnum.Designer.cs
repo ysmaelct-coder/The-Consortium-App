@@ -199,7 +199,7 @@ namespace TheConsortiumApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Propietario")
+                    b.Property<string>("NombrePropietario")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

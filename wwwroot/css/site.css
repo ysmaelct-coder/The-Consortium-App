@@ -1,4 +1,6 @@
-/* Reseteo y Tipografía General */
+/* ==========================================================================
+   1. RESETEO Y TIPOGRAFÍA GENERAL (FONDO DE LANDING)
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -7,94 +9,95 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
     color: #333;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: #ffffff !important; /* Base blanca total para la Landing / Página de inicio */
 }
 
-/* Diseño del Encabezado (Header) */
-header {
-    background-color: #2b4c7e; /* Azul institucional */
-    color: #ffffff;
-    padding: 0 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 60px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+/* Forzar que los contenedores bootstrap de las vistas no rompan el fondo */
+.container, .container-fluid {
+    background-color: transparent !important;
 }
 
-    header h1 {
-        font-size: 22px;
-        font-weight: bold;
-    }
-
-    header .user-area span {
-        font-size: 14px;
-        background-color: rgba(255,255,255,0.1);
-        padding: 6px 12px;
-        border-radius: 4px;
-    }
-
-/* Disposición Flexible Lado a Lado */
-.contenedor-principal {
-    display: flex;
-    flex: 1; /* Estira el contenedor para ocupar la pantalla restante */
-}
-
-/* Menú Lateral (Sidebar) */
-aside {
-    width: 240px;
-    background-color: #34495e; /* Gris pizarra */
-    padding-top: 15px;
-}
-
-    aside ul {
-        list-style: none;
-    }
-
-        aside ul li a {
-            display: block;
-            color: #ecf0f1;
-            padding: 14px 20px;
-            text-decoration: none;
-            font-size: 15px;
-            border-left: 4px solid transparent;
-        }
-
-            /* Pseudo-clase hover para la interacción visual */
-            aside ul li a:hover, aside ul li a.active {
-                background-color: #2c3e50;
-                color: #3498db;
-                border-left: 4px solid #3498db;
-                padding-left: 24px;
-                transition: all 0.2s ease-in-out;
-            }
-
-            aside ul li a.menu-logout:hover {
-                color: #e74c3c;
-                border-left-color: #e74c3c;
-            }
-
-/* Espacio del Área de Trabajo (Main Content) */
-main {
+/* ==========================================================================
+   2. ENTORNO INTERNO DEL PANEL DE ADMINISTRACIÓN (#PANEL-ADMINISTRACION)
+   ========================================================================== */
+#panel-administracion {
     flex: 1;
     padding: 30px;
-    background-color: #ffffff;
     overflow-y: auto;
+    background-color: #f8fafc !important; /* Gris azulado ultra claro de fondo (Limpio y ejecutivo) */
+    background-image: none !important;
 }
 
-    main h2 {
-        color: #2b4c7e;
+    #panel-administracion h1,
+    #panel-administracion h2 {
+        color: #2b4c7e !important; /* Azul institucional */
         margin-bottom: 25px;
         font-size: 24px;
-        border-bottom: 2px solid #f4f6f9;
+        border-bottom: 2px solid #dee2e6;
         padding-bottom: 10px;
+        font-weight: 700 !important;
+        text-shadow: none !important;
     }
 
-/* Estilos de las Tarjetas Resumen (Cards KPIs) */
+.contenedor-principal {
+    display: flex;
+    flex: 1;
+}
+
+/* ==========================================================================
+   3. MENÚ LATERAL (SIDEBAR PREMIUM)
+   ========================================================================== */
+aside {
+    width: 240px;
+    background-color: #1e293b; /* Gris oscuro azulado moderno */
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+    /* Unificamos y limpiamos las propiedades de los enlaces directos */
+    aside a {
+        display: block;
+        color: #ecf0f1 !important;
+        padding: 12px 15px !important;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        border-left: 4px solid transparent;
+        background-color: #2c3e50 !important; /* Gris pizarra fijo para que parezcan botones */
+        border-radius: 6px !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+        /* Efecto hover e indicador activo */
+        aside a:hover,
+        aside a.active {
+            background-color: #0f172a !important; /* Se vuelve Slate bien oscuro */
+            color: #3498db !important; /* Texto azul */
+            border-left: 4px solid #3498db !important; /* Línea azul indicadora */
+            padding-left: 18px !important; /* Micro-desplazamiento fluido */
+        }
+
+        /* Opción especial de cerrar sesión (Logout) */
+        aside a.menu-logout {
+            margin-top: 20px;
+            background-color: rgba(231, 76, 60, 0.1) !important; /* Fondo rojizo tenue */
+        }
+
+            aside a.menu-logout:hover {
+                background-color: #e74c3c !important; /* Fondo rojo pleno */
+                color: #ffffff !important;
+                border-left-color: #c0392b !important;
+            }
+
+/* ==========================================================================
+   4. COMPONENTES VISUALES COMPARTIDOS (CARDS, TABLES, ALERTS)
+   ========================================================================== */
 .tarjetas-resumen {
     display: flex;
     gap: 20px;
@@ -102,33 +105,42 @@ main {
     flex-wrap: wrap;
 }
 
-.card {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    padding: 20px;
-    min-width: 240px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    #panel-administracion .card,
+    #panel-administracion .alert,
+    .tarjetas-resumen > div {
+        background-color: #ffffff !important; /* Blanco puro para un contraste perfecto */
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
+        min-width: 240px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .card h3,
+    .tarjetas-resumen h3 {
+        color: #64748b !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+
+/* Base por defecto para textos destacados normales */
+.card .destacado {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2b4c7e;
+    margin-top: 8px;
 }
 
-    .card h3 {
-        font-size: 14px;
-        color: #7f8c8d;
-        text-transform: uppercase;
-    }
-
-    .card .destacado {
-        font-size: 28px;
-        font-weight: bold;
-        color: #2b4c7e;
-        margin-top: 8px;
-    }
-
-/* Estilos de Tablas de Reportes */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
+    background-color: #ffffff !important;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
     table th, table td {
@@ -147,6 +159,9 @@ table {
         background-color: #f9fbfd; /* Sombreado cebra interactivo */
     }
 
+/* ==========================================================================
+   5. BOTONES Y ACCIONES (UNIFICACIÓN CORPORATIVA SLATE)
+   ========================================================================== */
 .btn-ver {
     background-color: #3498db;
     color: white;
@@ -154,13 +169,112 @@ table {
     text-decoration: none;
     border-radius: 4px;
     font-size: 13px;
+    display: inline-block;
 }
 
     .btn-ver:hover {
         background-color: #2980b9;
     }
 
-/* Pie de Página */
+.btn-primary,
+.btn-success,
+.btn-danger,
+.btn-secondary,
+.btn-danger.shadow-sm,
+form button[type="submit"] {
+    background-color: #0f172a !important; /* Slate corporativo */
+    border-color: #0f172a !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease-in-out;
+}
+
+    .btn-primary:hover,
+    .btn-success:hover,
+    .btn-danger:hover,
+    .btn-secondary:hover,
+    form button[type="submit"]:hover {
+        background-color: #1e293b !important;
+        border-color: #1e293b !important;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+
+.btn-outline-danger,
+.btn-outline-secondary {
+    background-color: #0f172a !important;
+    border-color: #0f172a !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   6. IDENTIDAD DE COLORES IMPOSITIVA PARA LOS CONTADORES (KPI)
+   ========================================================================== */
+
+/* 💙 1. CONTADOR DE EMPRESAS (Primer recuadro - Azul) */
+.tarjetas-resumen > div:nth-child(1),
+.tarjetas-resumen > div:nth-child(1) *,
+#panel-administracion .tarjetas-resumen > div:nth-child(1) [class*="display"],
+#panel-administracion .tarjetas-resumen > div:nth-child(1) div {
+    color: #2563eb !important; /* Azul vibrante */
+    font-weight: 800 !important;
+}
+
+/* 🩵 2. CONTADOR DE CONSORCIOS (Segundo recuadro - Celeste) */
+.tarjetas-resumen > div:nth-child(2),
+.tarjetas-resumen > div:nth-child(2) *,
+#panel-administracion .tarjetas-resumen > div:nth-child(2) [class*="display"],
+#panel-administracion .tarjetas-resumen > div:nth-child(2) div {
+    color: #0284c7 !important; /* Azul cielo / Océano */
+    font-weight: 800 !important;
+}
+
+/* 💚 3. CONTADOR DE UNIDADES (Tercer recuadro - Verde) */
+.tarjetas-resumen > div:nth-child(3),
+.tarjetas-resumen > div:nth-child(3) *,
+#panel-administracion .tarjetas-resumen > div:nth-child(3) [class*="display"],
+#panel-administracion .tarjetas-resumen > div:nth-child(3) div {
+    color: #16a34a !important; /* Verde esmeralda limpio */
+    font-weight: 800 !important;
+}
+
+/* 🧡 4. CONTADOR DE ACTIVAS / ALQUILADAS (Cuarto recuadro - Naranja) */
+.tarjetas-resumen > div:nth-child(4),
+.tarjetas-resumen > div:nth-child(4) *,
+#panel-administracion .tarjetas-resumen > div:nth-child(4) [class*="display"],
+#panel-administracion .tarjetas-resumen > div:nth-child(4) div {
+    color: #ea580c !important; /* Naranja corporativo intenso */
+    font-weight: 800 !important;
+}
+
+/* ❤️ 5. RECUADRO DE GASTOS TOTALES (Rojo Alerta Financiera) */
+/* Este selector busca específicamente el texto que tenga el signo de pesos de tus gastos */
+#panel-administracion .card .destacado,
+.tarjetas-resumen .card .destacado,
+[class*="gasto"] .destacado,
+.text-danger,
+div:has(> h3:contains("Gastos")) div {
+    color: #dc3545 !important; /* Rojo vivo original */
+    font-weight: 800 !important;
+}
+
+/* 📋 PROTECCIÓN DE TABLAS: Evita que los textos de las tablas hereden los colores de arriba */
+#panel-administracion table,
+#panel-administracion table td,
+#panel-administracion table th {
+    color: #333333 !important;
+    font-weight: normal;
+}
+
+    #panel-administracion table th {
+        color: #2b4c7e !important;
+        font-weight: bold;
+    }
+
+/* ==========================================================================
+   7. PIE DE PÁGINA (FOOTER)
+   ========================================================================== */
 footer {
     background-color: #222222;
     color: #95a5a6;

@@ -3,56 +3,113 @@
     Layout = "_Layout";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow border-0 rounded-lg mt-5">
-                <div class="card-body p-5">
+<div class="d-flex align-items-center justify-content-center min-vh-100 w-100 position-absolute top-0 start-0"
+     style="background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)), url('/images/Login.jpeg') no-repeat center center fixed; background-size: cover; z-index: 10;">
 
-                    <div class="text-center mb-4">
-                        <h2 class="font-weight-bold text-primary">
-                            Contreras &amp; Asociados
-                        </h2>
-                        <p class="text-muted">
-                            Sistema de Gestión de Consorcios
-                        </p>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+
+                <div class="card shadow-lg border-0 rounded-4 bg-white animate-fade-in">
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-dark tracking-tight mb-1" style="font-size: 1.75rem;">
+                                Contreras &amp; Asociados
+                            </h2>
+                            <p class="text-muted small uppercase tracking-wider">
+                                Sistema de Gestión de Consorcios
+                            </p>
+                            <div class="mx-auto bg-primary mt-2 rounded" style="width: 40px; height: 3px; opacity: 0.8;"></div>
+                        </div>
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger d-flex align-items-center rounded-3 small py-2" role="alert">
+                                ⚠️ <div class="ms-2">@ViewBag.Error</div>
+                            </div>
+                        }
+
+                        <form asp-action="Login" method="post" autocomplete="off">
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-group mb-3">
+                                <label class="form-label small fw-bold text-secondary">Correo Electrónico</label>
+                                <input type="email" name="email" class="form-control form-control-lg fs-6 rounded-3 input-custom"
+                                       placeholder="admin@empresa.com" required />
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label small fw-bold text-secondary">Contraseña</label>
+                                <input type="password" name="password" class="form-control form-control-lg fs-6 rounded-3 input-custom"
+                                       placeholder="••••••••" required />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm py-2-5 fs-6 btn-submit-custom">
+                                Ingresar al Sistema
+                            </button>
+                        </form>
+
+                        <hr class="text-muted opacity-25 my-4">
+
+                        <div class="text-center">
+                            <a asp-action="Register" class="text-decoration-none small fw-semibold link-registro">
+                                ¿No tenés cuenta? <span class="text-primary">Registrar Empresa</span>
+                            </a>
+                        </div>
+
                     </div>
-
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">
-                            @ViewBag.Error
-                        </div>
-                    }
-
-                    <form asp-action="Login" method="post">
-                        @Html.AntiForgeryToken()
-
-                        <div class="form-group mb-3">
-                            <label class="form-label small font-weight-bold">Correo Electrónico</label>
-                            <input type="email" name="email" class="form-control form-control-lg"
-                                   placeholder="admin@empresa.com" required />
-                        </div>
-
-                        <div class="form-group mb-4">
-                            <label class="form-label small font-weight-bold">Contraseña</label>
-                            <input type="password" name="password" class="form-control form-control-lg"
-                                   placeholder="••••••••" required />
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">
-                            Ingresar
-                        </button>
-                    </form>
-
-                    <!-- 🔥 BOTÓN DE REGISTRO -->
-                    <a asp-action="Register"
-                       class="btn btn-link text-center mt-3 d-block">
-                        Crear nueva cuenta
-                    </a>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Efecto de enfoque más fino en los inputs */
+    .input-custom:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+    }
+
+    /* Animación suave para el botón de ingresar */
+    .btn-submit-custom {
+        transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .btn-submit-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+        }
+
+    /* Enlace de registro interactivo */
+    .link-registro {
+        color: #6c757d;
+        transition: color 0.2s ease;
+    }
+
+        .link-registro:hover {
+            color: #212529;
+        }
+
+            .link-registro:hover span {
+                text-decoration: underline;
+            }
+
+    /* Pequeña animación de entrada para que la tarjeta aparezca suavemente */
+    .animate-fade-in {
+        animation: fadeIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

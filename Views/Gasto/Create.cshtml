@@ -1,65 +1,149 @@
 ﻿@model TheConsortiumApp.Models.Gasto
 
-<h2>Nuevo Gasto</h2>
+@{
+    ViewData["Title"] = "Nuevo Gasto";
+}
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
-
-    <div class="mb-3">
-        <label asp-for="Concepto" class="form-label"></label>
-        <input asp-for="Concepto" class="form-control" />
-        <span asp-validation-for="Concepto" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Categoria" class="form-label"></label>
-
-            <select asp-for="Categoria" class="form-control">
-                <option value="">Seleccione...</option>
-                <option value="Sueldos">Sueldos</option>
-                <option value="Mantenimiento">Mantenimiento</option>
-                <option value="Servicios">Servicios</option>
-                <option value="Honorarios">Honorarios</option>
-                <option value="Limpieza">Limpieza</option>
-                <option value="Seguros">Seguros</option>
-                <option value="Otros">Otros</option>
-            </select>
-
-            <span asp-validation-for="Categoria" class="text-danger"></span>
+<div class="container mt-4" style="max-width: 700px;">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header bg-danger text-white p-3 rounded-top">
+            <div class="d-flex align-items-center">
+                <span class="fs-4 me-2">💰</span>
+                <h4 class="mb-0 fw-bold">Registrar Nuevo Gasto</h4>
+            </div>
         </div>
 
-    <div class="mb-3">
-        <label asp-for="Monto" class="form-label"></label>
+        <div class="card-body p-4 bg-white">
 
-        <div class="input-group">
-            <span class="input-group-text">$</span>
-
-            <input asp-for="Monto"
-                   type="text"
-                   inputmode="numeric"
-                   class="form-control"
-                   id="monto" />
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="FechaRegistro" class="form-label"></label>
-        <input asp-for="FechaRegistro" type="date" class="form-control" />
-        <span asp-validation-for="FechaRegistro" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="ConsorcioId" class="form-label"></label>
-
-        <select asp-for="ConsorcioId" class="form-control">
-            <option value="">Seleccione</option>
-
-            @foreach (var c in ViewBag.Consorcios)
+            @if (TempData["Debug"] != null)
             {
-                <option value="@c.Id">@c.Nombre</option>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Debug:</strong> @TempData["Debug"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
-        </select>
-    </div>
 
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Volver</a>
-</form>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger rounded-3" role="alert">
+                    <h6 class="fw-bold mb-2">⚠ Por favor, corregí los siguientes errores:</h6>
+                    <div asp-validation-summary="All" class="small text-danger ps-3"></div>
+                </div>
+            }
+
+            <form asp-action="Create" method="post" enctype="multipart/form-data" id="gastoForm">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Concepto" class="form-label fw-semibold">Concepto / Descripción</label>
+                    <input asp-for="Concepto" class="form-control focus-danger" placeholder="Ej: Reparación de ascensor principal" required />
+                    <span asp-validation-for="Concepto" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Categoria" class="form-label fw-semibold">Categoría</label>
+                        <select asp-for="Categoria" class="form-select" required>
+                            <option value="">Seleccione una categoría...</option>
+                            <option value="Sueldos">Sueldos</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Servicios">Servicios</option>
+                            <option value="Honorarios">Honorarios</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Seguros">Seguros</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                        <span asp-validation-for="Categoria" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ConsorcioId" class="form-label fw-semibold">Consorcio Vinculado</label>
+                        <select asp-for="ConsorcioId" class="form-select" required>
+                            <option value="">Seleccione un consorcio...</option>
+                            @if (ViewBag.Consorcios != null)
+                            {
+                                foreach (var c in ViewBag.Consorcios)
+                                {
+                                    <option value="@c.Id">@c.Nombre</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="ConsorcioId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Monto del Gasto</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light fw-bold text-muted">$</span>
+                            <input type="text"
+                                   inputmode="numeric"
+                                   class="form-control fw-bold text-dark"
+                                   id="montoVisual"
+                                   placeholder="0,00"
+                                   required />
+                        </div>
+                        <span asp-validation-for="Monto" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Comprobante / Factura</label>
+                        <input type="file" name="archivoFactura" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" />
+                        <div class="form-text small">Formatos permitidos: PDF, JPG, PNG.</div>
+                    </div>
+                </div>
+
+                <input type="hidden" asp-for="Monto" id="montoReal" />
+
+                <hr class="text-muted my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-light border px-4">
+                        ❌ Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                        💾 Guardar Gasto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const montoVisual = document.getElementById("montoVisual");
+        const montoReal = document.getElementById("montoReal");
+        const form = document.getElementById("gastoForm");
+
+        // Formateador dinámico mientras el usuario escribe (Estilo Moneda Argentina)
+        montoVisual.addEventListener("input", function (e) {
+            let value = this.value.replace(/\D/g, ""); // Elimina todo lo que no sea número
+
+            if (value) {
+                // Manejo de decimales flotantes centavos
+                let numeroCompleto = (Long(value) / 100).toFixed(2);
+
+                // Formateamos para que el usuario vea puntos en los miles y coma en los decimales
+                this.value = Number(numeroCompleto).toLocaleString("es-AR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            } else {
+                this.value = "";
+            }
+        });
+
+        // Evento Submit: Convertimos el formato visual a un float válido para C# (. como separador decimal)
+        form.addEventListener("submit", function (e) {
+            if (montoVisual.value) {
+                // Quitamos los puntos de miles y reemplazamos la coma decimal por un punto estándar
+                let valorLimpio = montoVisual.value.replace(/\./g, "").replace(",", ".");
+                montoReal.value = valorLimpio;
+            } else {
+                montoReal.value = "0.00";
+            }
+        });
+    </script>
+}

@@ -29,7 +29,6 @@
                 <td>@e.Email</td>
                 <td>@e.RazonSocial</td>
                 <td>@e.Cuit</td>
-
                 <td>@e.Consorcios.Count</td>
                 <td>
                     @if (e.Consorcios.Any())
@@ -44,13 +43,13 @@
                         <span class="text-muted">Sin consorcios</span>
                     }
                 </td>
-
                 <td>
                     <a asp-action="Details"
                        asp-route-id="@e.Id"
                        class="btn btn-info btn-sm mb-1">
                         Ver Detalles
                     </a>
+
                     <a asp-action="Delete"
                        asp-route-id="@e.Id"
                        class="btn btn-danger btn-sm"

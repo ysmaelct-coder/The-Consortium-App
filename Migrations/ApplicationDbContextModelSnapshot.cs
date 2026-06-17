@@ -22,6 +22,37 @@ namespace TheConsortiumApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("TheConsortiumApp.Models.ComprobantePago", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ArchivoAlquiler")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ArchivoExpensas")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaPago")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Periodo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UnidadFuncionalId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UnidadFuncionalId");
+
+                    b.ToTable("ComprobantesPagos");
+                });
+
             modelBuilder.Entity("TheConsortiumApp.Models.Consorcio", b =>
                 {
                     b.Property<int>("Id")
@@ -30,12 +61,21 @@ namespace TheConsortiumApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CantidadDepartamentos")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreadoPorEmail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Direccion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmpresaId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Localidad")
                         .IsRequired()
@@ -46,9 +86,14 @@ namespace TheConsortiumApp.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EmpresaId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Consorcios");
                 });
@@ -92,6 +137,9 @@ namespace TheConsortiumApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ArchivoFactura")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Categoria")
                         .HasColumnType("int");
 
@@ -109,9 +157,14 @@ namespace TheConsortiumApp.Migrations
                     b.Property<decimal>("Monto")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ConsorcioId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Gastos");
                 });
@@ -183,20 +236,29 @@ namespace TheConsortiumApp.Migrations
                     b.Property<int>("Ambientes")
                         .HasColumnType("int");
 
+                    b.Property<string>("ArchivoContrato")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("Coeficiente")
                         .HasColumnType("decimal(18, 4)");
 
                     b.Property<int>("ConsorcioId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("EstaAlquilada")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NombreInquilino")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NombrePropietario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("NroUnidad")
                         .HasColumnType("int");
 
                     b.Property<string>("PisoDepto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Propietario")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -207,6 +269,43 @@ namespace TheConsortiumApp.Migrations
                     b.ToTable("UnidadesFuncionales");
                 });
 
+            modelBuilder.Entity("TheConsortiumApp.Models.Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("TheConsortiumApp.Models.ComprobantePago", b =>
+                {
+                    b.HasOne("TheConsortiumApp.Models.UnidadFuncional", "UnidadFuncional")
+                        .WithMany("ComprobantesPagos")
+                        .HasForeignKey("UnidadFuncionalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UnidadFuncional");
+                });
+
             modelBuilder.Entity("TheConsortiumApp.Models.Consorcio", b =>
                 {
                     b.HasOne("TheConsortiumApp.Models.Empresa", "Empresa")
@@ -215,18 +314,28 @@ namespace TheConsortiumApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TheConsortiumApp.Models.Usuario", null)
+                        .WithMany("Consorcios")
+                        .HasForeignKey("UsuarioId");
+
                     b.Navigation("Empresa");
                 });
 
             modelBuilder.Entity("TheConsortiumApp.Models.Gasto", b =>
                 {
                     b.HasOne("TheConsortiumApp.Models.Consorcio", "Consorcio")
-                        .WithMany()
+                        .WithMany("Gastos")
                         .HasForeignKey("ConsorcioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TheConsortiumApp.Models.Usuario", "Usuario")
+                        .WithMany("Gastos")
+                        .HasForeignKey("UsuarioId");
+
                     b.Navigation("Consorcio");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("TheConsortiumApp.Models.LiquidacionExpensa", b =>
@@ -270,8 +379,21 @@ namespace TheConsortiumApp.Migrations
                     b.Navigation("Consorcio");
                 });
 
+            modelBuilder.Entity("TheConsortiumApp.Models.Usuario", b =>
+                {
+                    b.HasOne("TheConsortiumApp.Models.Empresa", "Empresa")
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Empresa");
+                });
+
             modelBuilder.Entity("TheConsortiumApp.Models.Consorcio", b =>
                 {
+                    b.Navigation("Gastos");
+
                     b.Navigation("UnidadesFuncionales");
                 });
 
@@ -283,6 +405,18 @@ namespace TheConsortiumApp.Migrations
             modelBuilder.Entity("TheConsortiumApp.Models.LiquidacionExpensa", b =>
                 {
                     b.Navigation("Detalles");
+                });
+
+            modelBuilder.Entity("TheConsortiumApp.Models.UnidadFuncional", b =>
+                {
+                    b.Navigation("ComprobantesPagos");
+                });
+
+            modelBuilder.Entity("TheConsortiumApp.Models.Usuario", b =>
+                {
+                    b.Navigation("Consorcios");
+
+                    b.Navigation("Gastos");
                 });
 #pragma warning restore 612, 618
         }

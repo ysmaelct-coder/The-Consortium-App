@@ -1,14 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-public enum TipoAmbientes
-{
-    Monoambiente = 1,
-    DosAmbientes = 2,
-    TresAmbientes = 3
-}
+using Microsoft.AspNetCore.Http; // 👈 IMPORTANTE: Para usar IFormFile
+
 namespace TheConsortiumApp.Models
 {
+    public enum TipoAmbientes
+    {
+        Monoambiente = 1,
+        DosAmbientes = 2,
+        TresAmbientes = 3,
+        CuatroAmbientes = 4,
+        CincoAmbientes = 5
+    }
 
     public class UnidadFuncional
     {
@@ -22,19 +25,32 @@ namespace TheConsortiumApp.Models
         [Display(Name = "Piso / Dpto")]
         public string PisoDepto { get; set; } = string.Empty;
 
-        // Resguardo de la precisión matemática según "Tipos de dato en Net.pdf"
         [Required(ErrorMessage = "Debe seleccionar la cantidad de ambientes")]
+        [Display(Name = "Ambientes")]
         public TipoAmbientes Ambientes { get; set; }
+
         public decimal Coeficiente { get; set; }
 
-        [Required(ErrorMessage = "El nombre del propietario o inquilino es obligatorio")]
-        public string Propietario { get; set; } = string.Empty;
+        [Required(ErrorMessage = "El nombre del propietario es obligatorio")]
+        [Display(Name = "Propietario")]
+        public string NombrePropietario { get; set; } = string.Empty;
 
-        // Clave Foránea (FK) hacia Consorcio
+        public string? NombreInquilino { get; set; }
+        public string? ArchivoContrato { get; set; }
+        public bool EstaAlquilada { get; set; }
+
         [Required]
         public int ConsorcioId { get; set; }
 
         [ForeignKey("ConsorcioId")]
-        public virtual Consorcio? Consorcio { get; set; } // Nombre normalizado por convención limpia
+        public virtual Consorcio? Consorcio { get; set; }
+
+        [NotMapped]
+        public string Propietario => NombrePropietario;
+
+        [NotMapped]
+        [Display(Name = "Contrato de Alquiler")]
+        public IFormFile? ArchivoInquilino { get; set; }
+        public virtual ICollection<ComprobantePago> ComprobantesPagos { get; set; } = [];
     }
 }

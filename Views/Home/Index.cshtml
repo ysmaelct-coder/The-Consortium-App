@@ -1,75 +1,222 @@
 ﻿@{
-    ViewData["Title"] = "Tablero Principal";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="container mt-4">
+<div class="position-relative overflow-hidden text-center bg-dark text-white d-flex align-items-center justify-content-center shadow-sm" style="min-height: 75vh;">
 
-    <video class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="object-fit: cover; opacity: 0.25; z-index: 1;" autoplay loop muted playsinline>
-        <source src="~/videos/consorcio-bg.mp4" type="video/mp4" />
+    <video autoplay loop muted playsinline id="videoFondo" class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="object-fit: cover; opacity: 0.3; z-index: 1; filter: grayscale(10%) brightness(90%); pointer-events: none;">
+        <source src="videos/consorcio-bg.mp4" type="video/mp4" />
         Tu navegador no soporta video.
     </video>
 
-    <div class="container position-relative p-5" style="z-index: 2;">
-        <h1 class="display-3 fw-bold mb-3 text-white">The Consortium App</h1>
-    </div>
+    <div class="container position-relative py-5 px-4" style="z-index: 2; max-width: 900px;">
+        <h1 class="display-2 fw-extrabold mb-3 text-white tracking-tight text-uppercase">
+            The Consortium App
         </h1>
-        <p class="lead fw-normal text-light mb-4 fs-4 mx-auto" style="max-width: 650px;">
+
+        <p class="lead fw-normal text-light-50 mb-5 fs-4 mx-auto border-top border-bottom border-light border-opacity-10 py-3" style="max-width: 700px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
             La solución definitiva, privada y escalable para la administración integral de consorcios, liquidación de expensas y control de gastos.
         </p>
+
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center align-items-center">
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-5 py-3 fw-bold shadow border-0 tracking-wide btn-login-custom">
+                🔑 Ingresar al Sistema
+            </a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg px-5 py-3 fw-semibold tracking-wide btn-registro-custom">
+                🏢 Registrar Empresa
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5 py-4">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark display-6">Módulos Profesionales e Independientes</h2>
+        <div class="mx-auto bg-danger mb-3 rounded" style="width: 60px; height: 4px;"></div>
+        <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">Arquitectura robusta diseñada para mantener la privacidad absoluta y el aislamiento total de tus datos corporativos.</p>
     </div>
 
-    <!--  KPI CARDS -->
-    <div class="row g-3 mb-4 text-center">
-
-        <div class="col-md-3">
-            <div class="card bg-primary text-white shadow-sm">
-                <div class="card-body">
-                    <h6 class="mb-1">Consorcios</h6>
-                    <h2 class="fw-bold">@ViewBag.TotalConsorcios</h2>
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 p-4 rounded-4 bg-white card-premium card-consorcios">
+                <div class="fs-1 mb-3 text-primary bg-primary bg-opacity-10 rounded-circle mx-auto d-flex align-items-center justify-content-center contenedor-icono-chico" style="width: 80px; height: 80px;">
+                    🏢
                 </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card bg-success text-white shadow-sm">
-                <div class="card-body">
-                    <h6 class="mb-1">Unidades</h6>
-                    <h2 class="fw-bold">@ViewBag.TotalUnidades</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark shadow-sm">
-                <div class="card-body">
-                    <h6 class="mb-1">Activas</h6>
-                    <h2 class="fw-bold">@ViewBag.UnidadesActivas</h2>
-                </div>
-            </div>
-        </div>
-
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-                    <div class="d-grid">
-                        <a asp-controller="Consorcio" asp-action="Index" class="btn btn-outline-primary">
-                            Ir a Consorcios
-                        </a>
-                    </div>
+                <h4 class="fw-bold card-title text-dark mb-2">Consorcios Centralizados</h4>
+                <p class="card-text text-muted small px-2 mb-4">Alta de edificios o barrios cerrados, administración inteligente de coeficientes de copropiedad y control operativo total.</p>
+                <div class="mt-auto">
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-sm btn-outline-primary px-4 py-2 rounded-pill fw-bold btn-card-action">Registrar Empresa</a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <div>
-                        <h5 class="fw-bold text-success">Unidades Funcionales</h5>
-                        <p class="text-muted mb-3">
-                            Visualiza y administra departamentos, propietarios y coeficientes.
-                        </p>
-                    </div>
+            <div class="card h-100 border-0 p-4 rounded-4 bg-white card-premium card-gastos">
+                <div class="fs-1 mb-3 text-danger bg-danger bg-opacity-10 rounded-circle mx-auto d-flex align-items-center justify-content-center contenedor-icono-chico" style="width: 80px; height: 80px;">
+                    💰
+                </div>
+                <h4 class="fw-bold card-title text-dark mb-2">Control de Gastos</h4>
+                <p class="card-text text-muted small px-2 mb-4">Carga y procesamiento ágil de comprobantes con almacenamiento digitalizado e indexación de facturas (PDF o imágenes).</p>
+                <div class="mt-auto">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-danger px-4 py-2 rounded-pill fw-bold btn-card-action text-white shadow-sm">🔑 Ingresar</a>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-md-4">
+            <div class="card h-100 border-0 p-4 rounded-4 bg-white card-premium card-reportes">
+                <div class="fs-1 mb-3 text-success bg-success bg-opacity-10 rounded-circle mx-auto d-flex align-items-center justify-content-center contenedor-icono-chico" style="width: 80px; height: 80px;">
+                    📊
+                </div>
+                <h4 class="fw-bold card-title text-dark mb-2">Reportes & Expensas</h4>
+                <p class="card-text text-muted small px-2 mb-4">Liquidación automatizada basada en el prorrateo real por unidad funcional, aislada herméticamente por inquilino.</p>
+                <div class="mt-auto">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-success px-4 py-2 rounded-pill fw-bold btn-card-action text-white shadow-sm">🔑 Ingresar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-light py-5 mt-5 border-top border-bottom border-light-subtle">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold text-dark display-6">Una experiencia administrativa ágil</h3>
+            <p class="text-muted fs-5">Optimice los tiempos de gestión mediante herramientas visuales modernas, limpias e intuitivas.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="overflow-hidden rounded-4 shadow-sm bg-dark position-relative contenedor-foto" style="height: 240px;">
+                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600" class="w-100 h-100 imagen-zoom" style="object-fit: cover; opacity: 0.8;" alt="Infraestructura" />
+                    <div class="position-absolute bottom-0 start-0 p-3 bg-gradient-dark w-100 text-white">
+                        <p class="mb-0 fw-bold small tracking-wide">Infraestructura Moderna</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="overflow-hidden rounded-4 shadow-sm bg-dark position-relative contenedor-foto" style="height: 240px;">
+                    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=600" class="w-100 h-100 imagen-zoom" style="object-fit: cover; opacity: 0.8;" alt="Contabilidad" />
+                    <div class="position-absolute bottom-0 start-0 p-3 bg-gradient-dark w-100 text-white">
+                        <p class="mb-0 fw-bold small tracking-wide">Transparencia Financiera</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="overflow-hidden rounded-4 shadow-sm bg-dark position-relative contenedor-foto" style="height: 240px;">
+                    <img src="data:image/jpeg;base64,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" class="w-100 h-100 imagen-zoom" style="object-fit: cover; opacity: 0.8;" alt="Métricas" />
+                    <div class="position-absolute bottom-0 start-0 p-3 bg-gradient-dark w-100 text-white">
+                        <p class="mb-0 fw-bold small tracking-wide">Reportes QuestPDF de Alta Precisión</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-extrabold {
+        font-weight: 850;
+    }
+
+    .bg-gradient-dark {
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+    }
+
+    /* --- TARJETAS PREMIUM CON ANIMACIÓN --- */
+    .card-premium {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+
+    /* --- ANIMACIÓN DE LOS CONTENEDORES REDONDOS DE LOS ICONOS --- */
+    .contenedor-icono-chico {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-card-action {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* --- COMPORTAMIENTO EFECTO HOVER DE LAS TARJETAS --- */
+    .card-premium:hover {
+        transform: translateY(-10px);
+    }
+
+        /* El circulo del icono se agranda y rota levemente cuando se pasa el mouse por la tarjeta */
+        .card-premium:hover .contenedor-icono-chico {
+            transform: scale(1.12) rotate(3deg);
+        }
+
+        .card-premium:hover .btn-card-action {
+            transform: scale(1.03);
+        }
+
+    /* 1. Modificaciones para Consorcios (Glow Azul) */
+    .card-consorcios:hover {
+        border-color: rgba(13, 110, 253, 0.3) !important;
+        box-shadow: 0 15px 35px rgba(13, 110, 253, 0.12) !important;
+    }
+        /* El contenedor chico del icono reacciona de forma única */
+        .card-consorcios:hover .contenedor-icono-chico {
+            background-color: rgba(13, 110, 253, 0.2) !important;
+            box-shadow: inset 0 0 10px rgba(13, 110, 253, 0.15), 0 4px 12px rgba(13, 110, 253, 0.15);
+        }
+
+    /* 2. Modificaciones para Gastos (Glow Rojo) */
+    .card-gastos:hover {
+        border-color: rgba(220, 53, 69, 0.3) !important;
+        box-shadow: 0 15px 35px rgba(220, 53, 69, 0.12) !important;
+    }
+        /* El contenedor chico del icono reacciona de forma única */
+        .card-gastos:hover .contenedor-icono-chico {
+            background-color: rgba(220, 53, 69, 0.2) !important;
+            box-shadow: inset 0 0 10px rgba(220, 53, 69, 0.15), 0 4px 12px rgba(220, 53, 69, 0.15);
+        }
+
+    /* 3. Modificaciones para Reportes (Glow Verde) */
+    .card-reportes:hover {
+        border-color: rgba(25, 135, 84, 0.3) !important;
+        box-shadow: 0 15px 35px rgba(25, 135, 84, 0.12) !important;
+    }
+        /* El contenedor chico del icono reacciona de forma única */
+        .card-reportes:hover .contenedor-icono-chico {
+            background-color: rgba(25, 135, 84, 0.2) !important;
+            box-shadow: inset 0 0 10px rgba(25, 135, 84, 0.15), 0 4px 12px rgba(25, 135, 84, 0.15);
+        }
+
+    /* --- INTERACCIONES DEL HERO Y OTROS --- */
+    .btn-login-custom {
+        background-color: #dc3545;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-login-custom:hover {
+            background-color: #bb2d3b !important;
+            transform: scale(1.02);
+        }
+
+    .btn-registro-custom {
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+        .btn-registro-custom:hover {
+            transform: scale(1.02);
+        }
+
+    .contenedor-foto {
+        cursor: pointer;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .imagen-zoom {
+        transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .contenedor-foto:hover .imagen-zoom {
+        transform: scale(1.05);
+    }
+</style>

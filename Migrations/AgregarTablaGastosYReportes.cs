@@ -81,7 +81,7 @@ namespace TheConsortiumApp.Migrations
                     NroUnidad = table.Column<int>(type: "int", nullable: false),
                     PisoDepto = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Coeficiente = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    Propietario = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NombrePropietario = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ConsorcioId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

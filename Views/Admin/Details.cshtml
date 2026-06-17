@@ -13,36 +13,78 @@
         <p class="mb-1"><strong>Email:</strong> @Model.Email</p>
         <p class="mb-1"><strong>CUIT:</strong> @Model.Cuit</p>
         <p class="mb-0"><strong>Total de consorcios:</strong> @Model.Consorcios.Count</p>
-</div>
+    </div>
 </div>
 
 <h4>Consorcios registrados</h4>
 
-<h4>Consorcios</h4>
-
 @if (Model.Consorcios.Any())
 {
-    @foreach (var c in Model.Consorcios)
-    {
-        <div class="card mb-3 p-3">
-            <h5>@c.Nombre</h5>
+    <div class="row">
+       @foreach (var c in Model.Consorcios)
+       {
+           <div class="card mb-3 shadow-sm">
+               <div class="card-body">
 
-            <p><strong>Dirección:</strong> @c.Direccion</p>
+                   <h5 class="text-primary">@c.Nombre</h5>
 
-            <p><strong>Total unidades:</strong> @c.UnidadesFuncionales.Count</p>
+                   <p><strong>Dirección:</strong> @c.Direccion</p>
+                   <p><strong>Localidad:</strong> @c.Localidad</p>
 
-            <p>
-                <strong>Total gastos:</strong>
-                $@c.Gastos.Sum(g => g.Monto)
-            </p>
-        </div>
-    }
+                   <p><strong>Creado por:</strong> @c.CreadoPorEmail</p>
+                   <p><strong>Fecha creación:</strong> @c.FechaCreacion.ToString("dd/MM/yyyy")</p>
+
+                   <p><strong>Total departamentos:</strong> @c.CantidadDepartamentos</p>
+
+                   <p>
+                       <strong>Unidades registradas:</strong>
+                       @(c.UnidadesFuncionales?.Count() ?? 0)
+                   </p>
+
+                   <p>
+                       <strong>Unidades activas:</strong>
+                       @(c.UnidadesFuncionales?.Count(u => u.EstaAlquilada) ?? 0)
+                   </p>
+
+                   <p>
+                       <strong>Total gastos:</strong>
+                       $@(c.Gastos?.Sum(g => g.Monto) ?? 0)
+                   </p>
+
+                   <hr />
+
+                   @if (c.UnidadesFuncionales != null && c.UnidadesFuncionales.Any())
+                   {
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Piso</th>
+                                    <th>Propietario / Inquilino</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var u in c.UnidadesFuncionales)
+                                {
+                                    <tr>
+                                        <td>@u.PisoDepto</td>
+                                        <td>@u.Propietario</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                   }
+
+               </div>
+           </div>
+       }
+    </div>
 }
 else
 {
-    <p class="text-muted">Esta empresa no tiene consorcios.</p>
+    <div class="alert alert-secondary">
+        Esta empresa no tiene consorcios registrados.
+    </div>
 }
 
-<a asp-action="Index" class="btn btn-secondary">
-    Volver
-</a>
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

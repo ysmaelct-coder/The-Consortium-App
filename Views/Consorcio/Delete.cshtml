@@ -1,0 +1,30 @@
+﻿@model TheConsortiumApp.Models.Consorcio
+
+@{
+    ViewData["Title"] = "Eliminar Consorcio";
+}
+
+<h2>Eliminar Consorcio</h2>
+
+<div class="alert alert-warning">
+    ¿Seguro que querés eliminar este consorcio?
+</div>
+
+<div class="mb-3">
+    <strong>Nombre:</strong> @Model.Nombre <br />
+    <strong>Dirección:</strong> @Model.Direccion <br />
+    <strong>Localidad:</strong> @Model.Localidad
+</div>
+
+<form asp-action="Delete">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit" class="btn btn-danger">
+        Confirmar Eliminación
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>

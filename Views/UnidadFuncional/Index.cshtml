@@ -1,28 +1,162 @@
 ﻿@model IEnumerable<TheConsortiumApp.Models.UnidadFuncional>
 
-<h2>Unidades Funcionales</h2>
+@{
+    ViewData["Title"] = "Unidades Funcionales";
+}
 
-<a asp-action="Create" class="btn btn-primary mb-3">
-    + Nueva Unidad
-</a>
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4 bg-white p-3 rounded shadow-sm border-start border-primary border-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">🏢 Unidades Funcionales</h2>
+            <p class="text-muted mb-0">Gestione las propiedades, coeficientes de copropiedad y contratos de alquiler.</p>
+        </div>
+        <div class="mt-2 mt-md-0">
+            <a asp-action="Create" class="btn btn-primary d-flex align-items-center gap-2 fw-semibold shadow-sm">
+                ➕ Nueva Unidad
+            </a>
+        </div>
+    </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Unidad</th>
-            <th>Piso / Depto</th>
-            <th>Coeficiente</th>
-        </tr>
-    </thead>
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary small fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3">Nro. Unidad</th>
+                            <th class="py-3">Piso / Depto</th>
+                            <th class="py-3 text-center">Ambientes</th>
+                            <th class="py-3">Estado de Ocupación / Habitabilidad</th>
+                            <th class="text-center">Documentación</th>
+                            <th class="py-3 text-center">Coeficiente</th>
+                            <th class="pe-4 py-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">
+                                        @item.NroUnidad
+                                    </td>
 
-    <tbody>
-        @foreach (var u in Model)
-        {
-            <tr>
-                <td>@u.NroUnidad</td>
-                <td>@u.PisoDepto</td>
-                <td>@u.Coeficiente</td>
-            </tr>
+                                    <td class="fw-semibold text-primary">
+                                        @item.PisoDepto
+                                    </td>
+
+                                    <td class="text-center fw-medium text-muted">
+                                        @item.Ambientes
+                                    </td>
+
+                                    <td>
+                                        @if (item.EstaAlquilada)
+                                        {
+                                            <div class="d-flex flex-column">
+                                                <div>
+                                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-2 px-2 py-1 small mb-1">Alquilado</span>
+                                                </div>
+                                                <span class="text-dark fw-medium small">
+                                                    Propietario: <span class="text-secondary">@item.NombrePropietario</span>
+                                                </span>
+                                                <span class="text-primary fw-bold small">
+                                                    ↳ Inquilino: <span>@item.NombreInquilino</span>
+                                                </span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex flex-column">
+                                                <div>
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2 px-2 py-1 small mb-1">Habitado por Dueño</span>
+                                                </div>
+                                                <span class="text-dark fw-bold small">
+                                                    Propietario: <span class="text-secondary">@item.NombrePropietario</span>
+                                                </span>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="text-center fw-bold text-dark fs-6">
+                                        @item.Coeficiente.ToString("N2") %
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        @if (!string.IsNullOrEmpty(item.ArchivoContrato))
+                                        {
+                                            <a href="~/contratos/@item.ArchivoContrato"
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 fw-semibold"
+                                               title="Abrir contrato de alquiler">
+                                                📄 Ver Contrato
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Sin archivos</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Gestionar Alquiler">
+                                                ✏️
+                                            </a>
+
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" onclick="return confirm('¿Está seguro de eliminar esta unidad?');" title="Eliminar">
+                                                🗑️
+                                            </a>
+                                            <a asp-action="CargarPago" asp-route-id="@item.Id" class="btn btn-sm btn-success d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Cargar Pago Mensual">
+                                                $
+                                            </a>
+                                            <a asp-action="VerPagos" asp-route-id="@item.Id" class="btn btn-sm btn-info d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; color: white;" title="Ver Pagos Mensuales">
+                                                👁️
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <p class="mb-0 fw-medium">No se encontraron unidades funcionales registradas en este consorcio.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarEliminarUnidad(id, nombre) {
+        Swal.fire({
+        title: '¿Eliminar esta unidad?',
+        text: `Vas a borrar el depto: "${nombre}". Al hacerlo, el 100% del coeficiente se redistribuirá automáticamente entre las unidades que queden.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+        }).then((result) => {
+        if (result.isConfirmed) {
+        window.location.href = `@Url.Action("Delete", "UnidadFuncional")/${id}`;
         }
-    </tbody>
-</table>
+        });
+        }
+    </script>
+    <style>
+        .hover-danger:hover {
+        background-color: #dc3545 !important;
+        color: white !important;
+        }
+    </style>
+}

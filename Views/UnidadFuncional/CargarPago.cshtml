@@ -1,0 +1,83 @@
+﻿@model TheConsortiumApp.Models.ComprobantePago
+
+<h2>💰 Registrar Pago Mensual - Unidad @ViewBag.UnidadInfo</h2>
+
+<div class="card p-4 shadow-sm bg-white">
+    <form asp-action="CargarPago" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="UnidadFuncionalId" />
+
+        <!--  SELECCIÓN DEL MES -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-bold">Seleccionar Período Mensual</label>
+            <input type="month" id="selectorPeriodo" asp-for="Periodo" class="form-control" required />
+        </div>
+
+        <!--  DÍA EXACTO DEL ABONO (CON FILTRO DE 10 DÍAS HÁBILES AUTOMÁTICO) -->
+        <div class="mb-3 col-md-6">
+            <label class="form-label fw-bold">Fecha del Abono (Primeros 10 días hábiles)</label>
+            <input type="date" id="fechaPagoInput" asp-for="FechaPago" class="form-control" required />
+            <small class="text-muted">El sistema restringe la selección al rango legal permitido del período elegido.</small>
+        </div>
+
+        <hr />
+
+        <!--  COMPROBANTE DE ALQUILER -->
+        <div class="mb-3 col-md-8">
+            <label class="form-label fw-bold">Comprobante de Pago de Alquiler</label>
+            <input type="file" asp-for="InputArchivoAlquiler" class="form-control" accept="image/*,.pdf" required />
+        </div>
+
+        <!--  COMPROBANTE DE EXPENSAS -->
+        <div class="mb-3 col-md-8">
+            <label class="form-label fw-bold">Comprobante de Pago de Expensas</label>
+            <input type="file" asp-for="InputArchivoExpensas" class="form-control" accept="image/*,.pdf" required />
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success px-4">💾 Confirmar e Insertar Pagos</button>
+            <a asp-action="Index" class="btn btn-secondary">Volver</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const selectorPeriodo = document.getElementById('selectorPeriodo');
+        const fechaPagoInput = document.getElementById('fechaPagoInput');
+
+        function calcularDiasHabiles() {
+            if (!selectorPeriodo.value) return;
+
+            const [year, month] = selectorPeriodo.value.split('-');
+            let fechaMin = new Date(year, month - 1, 1);
+            let fechaMax = new Date(year, month - 1, 1);
+
+            // Buscamos el décimo día hábil (saltando sábados y domingos)
+            let diasHabilesContados = 0;
+            while (diasHabilesContados < 10) {
+                let dayOfWeek = fechaMax.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // 0 es Domingo, 6 es Sábado
+                    diasHabilesContados++;
+                }
+                if (diasHabilesContados < 10) {
+                    fechaMax.setDate(fechaMax.getDate() + 1);
+                }
+            }
+
+            // Formateamos las fechas a formato YYYY-MM-DD para el input HTML5
+            const formatInputDate = (d) => d.toISOString().split('T')[0];
+
+            fechaPagoInput.min = formatInputDate(fechaMin);
+            fechaPagoInput.max = formatInputDate(fechaMax);
+            fechaPagoInput.value = formatInputDate(fechaMin); // Setea por defecto el día 1
+        }
+
+        selectorPeriodo.addEventListener('change', calcularDiasHabiles);
+
+        // Inicializar con el mes actual al cargar
+        const hoy = new Date();
+        selectorPeriodo.value = hoy.toISOString().substring(0, 7);
+        calcularDiasHabiles();
+    </script>
+}

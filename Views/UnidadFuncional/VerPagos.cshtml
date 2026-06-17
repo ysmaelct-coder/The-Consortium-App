@@ -1,0 +1,90 @@
+﻿@model TheConsortiumApp.Models.UnidadFuncional
+
+@{
+    ViewData["Title"] = "Historial de Pagos Mensuales";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>💰 Historial de Pagos Mensuales</h2>
+        <a asp-action="Index" class="btn btn-secondary">🔙 Volver a la Lista</a>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body bg-light">
+            <div class="row text-dark">
+                <div class="col-md-3"><strong>📍 Unidad:</strong> @Model.PisoDepto (Nro @Model.NroUnidad)</div>
+                <div class="col-md-4"><strong>🏢 Consorcio:</strong> @Model.Consorcio?.Nombre</div>
+                <div class="col-md-5">
+                    <strong>👤 Estado actual:</strong>
+                    @if (Model.EstaAlquilada)
+                    {
+                        <span class="badge bg-info text-dark">Alquilada por: @Model.NombreInquilino</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Habitada por Dueño: @Model.NombrePropietario</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 shadow-sm bg-white">
+        @if (Model.ComprobantesPagos != null && Model.ComprobantesPagos.Any())
+        {
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>📆 Período / Mes</th>
+                        <th>📅 Fecha de Abono</th>
+                        <th class="text-center">🏠 Ticket Alquiler</th>
+                        <th class="text-center">💵 Ticket Expensas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pago in Model.ComprobantesPagos.OrderByDescending(p => p.Periodo))
+                    {
+                        <tr>
+                            <td><strong class="text-primary">@pago.Periodo</strong></td>
+                            <td>📅 @pago.FechaPago.ToShortDateString()</td>
+
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(pago.ArchivoAlquiler))
+                                {
+                                    <a href="~/comprobantes_mensuales/@pago.ArchivoAlquiler" target="_blank" class="btn btn-sm btn-outline-primary px-3">
+                                        📄 Abrir Comprobante
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No aplica / No subido</span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(pago.ArchivoExpensas))
+                                {
+                                    <a href="~/comprobantes_mensuales/@pago.ArchivoExpensas" target="_blank" class="btn btn-sm btn-outline-success px-3">
+                                        📄 Abrir Comprobante
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No subido</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <h4 class="text-muted">☕ No hay pagos registrados para esta unidad todavía.</h4>
+                <p class="text-secondary">Hacé clic en el botón de registrar pagos ($) desde la pantalla de inicio para insertar el primero.</p>
+            </div>
+        }
+    </div>
+</div>

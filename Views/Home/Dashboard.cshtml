@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "Tablero Principal";
+}
+
+<div class="container-fluid mt-4">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-1">Tablero Principal</h2>
+            <p class="text-muted mb-0">
+                Panorama general del sistema de gestión de consorcios
+            </p>
+        </div>
+
+        <div class="mt-2 mt-md-0 d-flex gap-2">
+            <a asp-controller="Consorcio" asp-action="Create" class="btn btn-primary">
+                + Nuevo Consorcio
+            </a>
+
+            <a asp-controller="Gasto" asp-action="Create" class="btn btn-outline-danger">
+                + Nuevo Gasto
+            </a>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row mb-4 text-center">
+
+        @if (ViewBag.TotalEmpresas != null)
+        {
+            <div class="col-md-3">
+                <div class="p-3 border rounded shadow-sm">
+                    <div class="text-muted small">Empresas</div>
+                    <h1 class="fw-bold text-dark display-6">@ViewBag.TotalEmpresas</h1>
+                </div>
+            </div>
+        }
+
+        <div class="col-md-3">
+            <div class="p-3 border rounded shadow-sm">
+                <div class="text-muted small">Consorcios</div>
+                <h1 class="fw-bold text-primary display-5">@ViewBag.TotalConsorcios</h1>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="p-3 border rounded shadow-sm">
+                <div class="text-muted small">Unidades</div>
+                <h1 class="fw-bold text-success display-5">@ViewBag.TotalUnidades</h1>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="p-3 border rounded shadow-sm">
+                <div class="text-muted small">Activas</div>
+                <h1 class="fw-bold text-warning display-5">@ViewBag.UnidadesActivas</h1>
+            </div>
+        </div>
+
+        <div class="col-md-3 mt-3 mt-md-0">
+            <div class="p-3 border rounded shadow-sm">
+                <div class="text-muted small">Gastos del Mes</div>
+                <h2 class="fw-bold text-danger">$@ViewBag.GastosMesActual</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCESOS RÁPIDOS -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-bold text-primary">Gestión de Consorcios</h5>
+                        <p class="text-muted mb-3">
+                            Alta, edición, consulta y eliminación de edificios o barrios administrados.
+                        </p>
+                    </div>
+                    <div class="d-grid">
+                        <a asp-controller="Consorcio" asp-action="Index" class="btn btn-outline-primary">
+                            Ir a Consorcios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-bold text-success">Unidades Funcionales</h5>
+                        <p class="text-muted mb-3">
+                            Visualiza y administra departamentos, NombrePropietarios y coeficientes.
+                        </p>
+                    </div>
+                    <div class="d-grid">
+                        <a asp-controller="UnidadFuncional" asp-action="Index" class="btn btn-outline-success">
+                            Ir a Unidades
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-bold text-danger">Gastos y Reportes</h5>
+                        <p class="text-muted mb-3">
+                            Registra gastos, consulta comprobantes y genera liquidaciones.
+                        </p>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Gasto" asp-action="Index" class="btn btn-outline-danger">
+                            <i class="bi bi-cash-stack"></i> Ir a Gastos
+                        </a>
+
+
+                       
+                        <a asp-controller="Reportes" asp-action="Index" class="btn btn-outline-info">
+                            Ver Reportes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ACTIVIDAD RECIENTE -->
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-bold">🏘️ Últimas Unidades</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Piso / Depto</th>
+                                <th>NombrePropietario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.UltimasUnidades != null)
+                            {
+                                @foreach (var u in ViewBag.UltimasUnidades)
+                                {
+                                    <tr>
+                                        <td>@u.PisoDepto</td>
+                                        <td>@u.NombrePropietario</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">No hay unidades</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white fw-bold">💰 Últimos Gastos</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Concepto</th>
+                                <th>Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.UltimosGastos != null)
+                            {
+                                @foreach (var g in ViewBag.UltimosGastos)
+                                {
+                                    <tr>
+                                        <td>@g.Concepto</td>
+                                        <td>$@g.Monto</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">No hay gastos</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

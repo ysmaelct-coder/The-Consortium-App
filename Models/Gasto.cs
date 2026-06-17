@@ -2,11 +2,17 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TheConsortiumApp.Models
+
 {
     public class Gasto
     {
         [Key]
+        
         public int Id { get; set; }
+        public int? UsuarioId { get; set; }
+        public Usuario? Usuario { get; set; }
+
+
 
         [Required(ErrorMessage = "El concepto o descripción del gasto es obligatorio")]
         [StringLength(200, ErrorMessage = "La descripción no puede superar los 200 caracteres")]
@@ -29,5 +35,8 @@ namespace TheConsortiumApp.Models
 
         [ForeignKey("ConsorcioId")]
         public virtual Consorcio? Consorcio { get; set; }
+
+        // ✅ Factura adjunta (opcional)
+        public string? ArchivoFactura { get; set; }
     }
 }

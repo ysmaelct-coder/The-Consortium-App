@@ -60,11 +60,14 @@ namespace TheConsortiumApp.Controllers
         // POST: Consorcio/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Create([Bind("Nombre,Direccion,Localidad")] Consorcio consorcio)
         {
             var empresaId = GetEmpresaId();
             if (empresaId == null)
                 return RedirectToAction("Login", "Account");
+            consorcio.CreadoPorEmail = HttpContext.Session.GetString("UserEmail");
+            consorcio.FechaCreacion = DateTime.Now;
 
             // set FK obligatoria
             consorcio.EmpresaId = empresaId.Value;

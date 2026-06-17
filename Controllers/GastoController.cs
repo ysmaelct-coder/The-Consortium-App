@@ -1,27 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using TheConsortiumApp.Data;
 using TheConsortiumApp.Models;
 using QuestPDF.Fluent;
+using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace TheConsortiumApp.Controllers
 {
-    public class GastoController : Controller
+    public class GastoController(ApplicationDbContext context) : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context = context;
 
-        public GastoController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        // Helper: EmpresaId desde sesión
+        // Helpers de Sesión Optimizados y Seguros
         private int? GetEmpresaId() => HttpContext.Session.GetInt32("EmpresaId");
+        private string? GetUserEmail() => HttpContext.Session.GetString("UserEmail");
 
-        // Helper: obtener mis consorcios
+        // Helper: Obtener consorcios filtrados estrictamente por Empresa logueada
         private async Task<List<Consorcio>> GetMisConsorciosAsync(int empresaId)
         {
             return await _context.Consorcios
@@ -31,85 +32,70 @@ namespace TheConsortiumApp.Controllers
                 .ToListAsync();
         }
 
-        // ✅ LISTAR + FILTRAR (mes/año/consorcio) + TOTAL (SOLO MIS CONSORCIOS)
+        // 1. LISTAR (INDEX) - PRIVADO POR EMPRESA
         [HttpGet]
-        public async Task<IActionResult> Index(int? consorcioId, int? year, int? month)
+        public async Task<IActionResult> Index()
         {
-            int? empresaId = GetEmpresaId();
-            if (empresaId == null)
+            var emailActual = GetUserEmail();
+            var empresaId = GetEmpresaId();
+
+            if (string.IsNullOrEmpty(emailActual) || empresaId == null)
+            {
                 return RedirectToAction("Login", "Account");
+            }
 
-            int y = year ?? DateTime.Today.Year;
-            int m = month ?? DateTime.Today.Month;
+            var misConsorciosIds = await _context.Consorcios
+                .Where(c => c.EmpresaId == empresaId.Value)
+                .Select(c => c.Id)
+                .ToListAsync();
 
-            var misConsorcios = await GetMisConsorciosAsync(empresaId.Value);
-
-            ViewBag.Consorcios = misConsorcios;
-            ViewBag.ConsorcioIdSeleccionado = consorcioId ?? 0;
-            ViewBag.Year = y;
-            ViewBag.Month = m;
-
-            // IDs permitidos para seguridad
-            var misConsorciosIds = misConsorcios.Select(c => c.Id).ToList();
-
-            // Query base: SOLO gastos de mis consorcios
-            var query = _context.Gastos
+            var gastos = await _context.Gastos
                 .Include(g => g.Consorcio)
                 .Where(g => misConsorciosIds.Contains(g.ConsorcioId))
-                .AsQueryable();
-
-            // Filtro mes/año
-            query = query.Where(g => g.FechaRegistro.Year == y && g.FechaRegistro.Month == m);
-
-            // Filtro por consorcio
-            if (consorcioId.HasValue && consorcioId.Value > 0)
-                query = query.Where(g => g.ConsorcioId == consorcioId.Value);
-
-            // Total arriba de tabla
-            ViewBag.TotalGastos = await query.SumAsync(g => (decimal?)g.Monto) ?? 0m;
-
-            var gastos = await query
                 .OrderByDescending(g => g.FechaRegistro)
                 .ToListAsync();
 
             return View(gastos);
         }
 
-        // ✅ FORM CREAR
+        // 2. FORMULARIO CREAR (GET)
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            int? empresaId = GetEmpresaId();
-            if (empresaId == null)
+            var empresaId = GetEmpresaId();
+
+            if (empresaId is null)
                 return RedirectToAction("Login", "Account");
 
             ViewBag.Consorcios = await GetMisConsorciosAsync(empresaId.Value);
-            return View(new Gasto());
+
+            return View();
         }
 
-        // ✅ GUARDAR GASTO + FACTURA
+        // 3. PROCESAR CREAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Gasto gasto, IFormFile? archivoFactura)
         {
-            int? empresaId = GetEmpresaId();
-            if (empresaId == null)
+            var emailActual = GetUserEmail();
+            var empresaId = GetEmpresaId();
+
+            if (string.IsNullOrEmpty(emailActual) || empresaId == null)
                 return RedirectToAction("Login", "Account");
 
             bool consorcioValido = await _context.Consorcios
                 .AnyAsync(c => c.Id == gasto.ConsorcioId && c.EmpresaId == empresaId.Value);
 
             if (!consorcioValido)
-                ModelState.AddModelError("ConsorcioId", "Seleccione un consorcio válido.");
+                ModelState.AddModelError("ConsorcioId", "Seleccione un consorcio válido de su lista.");
 
-            // Validación opcional del archivo
-            if (archivoFactura != null && archivoFactura.Length > 0)
+            if (archivoFactura is not null && archivoFactura.Length > 0)
             {
                 var ext = Path.GetExtension(archivoFactura.FileName).ToLowerInvariant();
                 var permitidos = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".webp" };
 
                 if (!permitidos.Contains(ext))
-                    ModelState.AddModelError("", "Solo se permiten archivos PDF o imágenes (.jpg, .jpeg, .png, .webp).");
+                    ModelState.AddModelError("", "Solo se permiten PDF o imágenes.");
             }
 
             if (!ModelState.IsValid)
@@ -118,10 +104,10 @@ namespace TheConsortiumApp.Controllers
                 return View(gasto);
             }
 
-            // Guardar factura si se adjunta archivo
-            if (archivoFactura != null && archivoFactura.Length > 0)
+            if (archivoFactura is not null && archivoFactura.Length > 0)
             {
-                var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(archivoFactura.FileName);
+                var nombreArchivo = $"{Guid.NewGuid()}{Path.GetExtension(archivoFactura.FileName)}";
+                var carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "facturas");
 
                 if (!Directory.Exists(carpeta))
                     Directory.CreateDirectory(carpeta);
@@ -131,9 +117,12 @@ namespace TheConsortiumApp.Controllers
                 using (var stream = new FileStream(ruta, FileMode.Create))
                 {
                     await archivoFactura.CopyToAsync(stream);
+                }
 
                 gasto.ArchivoFactura = nombreArchivo;
             }
+
+            gasto.FechaRegistro = DateTime.Now;
 
             _context.Gastos.Add(gasto);
             await _context.SaveChangesAsync();
@@ -141,22 +130,22 @@ namespace TheConsortiumApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ ELIMINAR (solo si pertenece a mis consorcios)
+        // 4. ELIMINAR (DELETE)
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            int? empresaId = GetEmpresaId();
-            if (empresaId == null)
+            var empresaId = GetEmpresaId();
+            if (empresaId is null)
                 return RedirectToAction("Login", "Account");
 
             var gasto = await _context.Gastos
                 .Include(g => g.Consorcio)
                 .FirstOrDefaultAsync(g => g.Id == id);
 
-            if (gasto == null)
+            if (gasto is null)
                 return NotFound();
 
-            if (gasto.Consorcio == null || gasto.Consorcio.EmpresaId != empresaId.Value)
+            if (gasto.Consorcio?.EmpresaId != empresaId.Value)
                 return Forbid();
 
             _context.Gastos.Remove(gasto);
@@ -165,23 +154,19 @@ namespace TheConsortiumApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ✅ EXPORTAR PDF
+        // 5. EXPORTAR PDF REFACTORIZADO CON DISEÑO PREMIUM CORPORATIVO
         [HttpGet]
         public async Task<IActionResult> ExportPdf(int? consorcioId, int? year, int? month)
         {
-            int? empresaId = GetEmpresaId();
-            if (empresaId == null)
+            var empresaId = GetEmpresaId();
+            if (empresaId is null)
                 return RedirectToAction("Login", "Account");
 
             int y = year ?? DateTime.Today.Year;
             int m = month ?? DateTime.Today.Month;
+            string periodoStr = $"{y}-{m:D2}";
 
-            var misConsorcios = await _context.Consorcios
-                .Where(c => c.EmpresaId == empresaId.Value)
-                .OrderBy(c => c.Nombre)
-                .AsNoTracking()
-                .ToListAsync();
-
+            var misConsorcios = await GetMisConsorciosAsync(empresaId.Value);
             var misConsorciosIds = misConsorcios.Select(c => c.Id).ToList();
 
             var query = _context.Gastos
@@ -192,74 +177,105 @@ namespace TheConsortiumApp.Controllers
             query = query.Where(g => g.FechaRegistro.Year == y && g.FechaRegistro.Month == m);
 
             string consorcioTitulo = "Todos los consorcios";
-            if (consorcioId.HasValue && consorcioId.Value > 0)
-            {
-                query = query.Where(g => g.ConsorcioId == consorcioId.Value);
 
-                var cons = misConsorcios.FirstOrDefault(c => c.Id == consorcioId.Value);
-                if (cons != null) consorcioTitulo = cons.Nombre;
+            if (consorcioId is > 0)
+            {
+                if (!misConsorciosIds.Contains(consorcioId.Value))
+                {
+                    return Forbid();
+                }
+
+                query = query.Where(g => g.ConsorcioId == consorcioId.Value);
+                consorcioTitulo = misConsorcios.FirstOrDefault(c => c.Id == consorcioId.Value)?.Nombre ?? consorcioTitulo;
             }
 
-            var gastos = await query
-                .OrderByDescending(g => g.FechaRegistro)
-                .ToListAsync();
-
+            var gastos = await query.OrderByDescending(g => g.FechaRegistro).ToListAsync();
             var total = gastos.Sum(g => g.Monto);
 
+            // Armado del PDF con espaciado controlado y fuentes legibles (Sintaxis compatible)
             var pdfBytes = Document.Create(container =>
             {
                 container.Page(page =>
                 {
-                    page.Margin(30);
+                    page.Size(PageSizes.A4);
+                    page.Margin(35);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
 
-                    page.Header().Column(h =>
+                    // Encabezado Corporativo elegante
+                    page.Header().Row(row =>
                     {
-                        h.Item().Text("Contreras & Asociados").FontSize(18).SemiBold();
-                        h.Item().Text($"Gastos - {y}-{m:D2}").FontSize(14);
-                        h.Item().Text($"Consorcio: {consorcioTitulo}").FontSize(11);
+                        row.RelativeItem().Column(col =>
+                        {
+                            col.Item().Text("Contreras & Asociados").FontSize(22).Bold().FontColor("#0f172a");
+                            col.Item().Text("Administración Integral de Consorcios").FontSize(10).Italic().FontColor("#64748b");
+                            col.Item().PaddingTop(5).Text($"Consorcio: {consorcioTitulo}").FontSize(11).Bold().FontColor("#475569");
+                        });
+
+                        row.ConstantItem(160).Column(col =>
+                        {
+                            col.Item().Background("#f1f5f9").Padding(10).Column(innerCol =>
+                            {
+                                innerCol.Item().Text("REPORTE DE GASTOS").FontSize(9).Bold().FontColor("#1e293b");
+                                innerCol.Item().Text($"Período: {periodoStr}").FontSize(11).Bold().FontColor("#0d6efd");
+                                innerCol.Item().Text($"Fecha Emisión: {DateTime.Today.ToShortDateString()}").FontSize(8).FontColor("#64748b");
+                            });
+                        });
                     });
 
-                    page.Content().Column(col =>
+                    // Tabla de contenido central con anchos explícitos para que no se encima nada
+                    page.Content().PaddingTop(25).Column(col =>
                     {
-                        col.Item().Text($"Total: ${total:0.00}").FontSize(12).SemiBold();
-
-                        col.Item().Table(table =>
+                        col.Item().Background("#0f172a").Padding(12).Row(row =>
                         {
-                            table.ColumnsDefinition(columns =>
+                            row.RelativeItem().Text("TOTAL DE GASTOS REGISTRADOS:").Bold().FontColor(Colors.White).FontSize(11);
+                            row.ConstantItem(150).Text($"$ {total:N2}").Bold().FontColor(Colors.White).FontSize(11).AlignRight();
+                        });
+
+                        col.Item().PaddingTop(20).Text("Detalle Analítico de Movimientos Financieros").FontSize(12).Bold().FontColor("#1e293b");
+
+                        col.Item().PaddingTop(10).Table(tabla =>
+                        {
+                            tabla.ColumnsDefinition(columns =>
                             {
-                                columns.RelativeColumn(3); // Concepto
-                                columns.RelativeColumn(2); // Categoria
-                                columns.RelativeColumn(2); // Monto
-                                columns.RelativeColumn(2); // Fecha
-                                columns.RelativeColumn(3); // Consorcio
+                                columns.ConstantColumn(70);  // Fecha
+                                columns.RelativeColumn(2);   // Concepto / Descripción
+                                columns.RelativeColumn((float)1.5); // Categoría
+                                columns.ConstantColumn(120); // Monto fijo amplio para millones sin romperse
                             });
 
-                            table.Header(header =>
+                            tabla.Header(header =>
                             {
-                                header.Cell().Text("Concepto").SemiBold();
-                                header.Cell().Text("Categoría").SemiBold();
-                                header.Cell().Text("Monto").SemiBold();
-                                header.Cell().Text("Fecha").SemiBold();
-                                header.Cell().Text("Consorcio").SemiBold();
+                                header.Cell().Background("#f8fafc").Padding(8).BorderBottom(2).BorderColor("#cbd5e1").Text("Fecha").Bold().FontColor("#475569");
+                                header.Cell().Background("#f8fafc").Padding(8).BorderBottom(2).BorderColor("#cbd5e1").Text("Concepto / Descripción").Bold().FontColor("#475569");
+                                header.Cell().Background("#f8fafc").Padding(8).BorderBottom(2).BorderColor("#cbd5e1").Text("Categoría").Bold().FontColor("#475569");
+                                header.Cell().Background("#f8fafc").Padding(8).BorderBottom(2).BorderColor("#cbd5e1").Text("Monto").Bold().FontColor("#475569").AlignRight();
                             });
 
                             foreach (var g in gastos)
                             {
-                                table.Cell().Text(g.Concepto);
-                                table.Cell().Text(g.Categoria.ToString());
-                                table.Cell().Text($"${g.Monto:0.00}");
-                                table.Cell().Text(g.FechaRegistro.ToString("yyyy-MM-dd"));
-                                table.Cell().Text(g.Consorcio?.Nombre ?? "");
+                                tabla.Cell().BorderBottom(1).BorderColor("#e2e8f0").Padding(8).Text(g.FechaRegistro.ToString("dd/MM/yyyy")).FontColor("#334155");
+                                tabla.Cell().BorderBottom(1).BorderColor("#e2e8f0").Padding(8).Text(g.Concepto).FontColor("#1e293b");
+                                tabla.Cell().BorderBottom(1).BorderColor("#e2e8f0").Padding(8).Text(g.Categoria.ToString()).FontColor("#475569");
+                                tabla.Cell().BorderBottom(1).BorderColor("#e2e8f0").Padding(8).Text($"$ {g.Monto:N2}").Bold().FontColor("#0f172a").AlignRight();
                             }
                         });
                     });
 
-                    page.Footer().AlignCenter().Text("Sistema de Consorcios");
+                    // Pie de Página corporativo
+                    page.Footer().BorderTop(1).BorderColor("#cbd5e1").PaddingTop(10).Row(row =>
+                    {
+                        row.RelativeItem().Text("The Consortium App - Control de Auditoría Interna de Gastos.").FontSize(8).FontColor("#94a3b8");
+                        row.RelativeItem().AlignRight().Text(x =>
+                        {
+                            x.Span("Página ").FontSize(8).FontColor("#94a3b8");
+                            x.CurrentPageNumber().FontSize(8).FontColor("#94a3b8");
+                        });
+                    });
                 });
             }).GeneratePdf();
 
-            var fileName = $"Gastos_{y}-{m:D2}.pdf";
-            return File(pdfBytes, "application/pdf", fileName);
+            return File(pdfBytes, "application/pdf", $"Gastos_{consorcioTitulo.Replace(" ", "_")}_{periodoStr}.pdf");
         }
     }
 }

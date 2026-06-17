@@ -1,5 +1,9 @@
 ﻿@model IEnumerable<TheConsortiumApp.Models.Consorcio>
 
+@{
+    ViewData["Title"] = "Consorcios";
+}
+
 <h2>Consorcios</h2>
 
 <a asp-action="Create" class="btn btn-primary mb-3">
@@ -25,32 +29,12 @@
                 <td>@c.Nombre</td>
                 <td>@c.Direccion</td>
                 <td>@c.Localidad</td>
-
-                <td>@c.UnidadesFuncionales?.Count()</td>
+                <td>@(c.UnidadesFuncionales?.Count() ?? 0)</td>
                 <td>$@(c.Gastos?.Sum(g => g.Monto) ?? 0)</td>
-
                 <td>
-                    <a asp-controller="Consorcio"
-                       asp-action="Details"
-                       asp-route-id="@c.Id"
-                       class="btn btn-info btn-sm">
-                        Ver
-                    </a>
-
-                    <a asp-controller="Consorcio"
-                       asp-action="Edit"
-                       asp-route-id="@c.Id"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-
-                    <a asp-controller="Consorcio"
-                       asp-action="Delete"
-                       asp-route-id="@c.Id"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('¿Eliminar consorcio?');">
-                        Eliminar
-                    </a>
+                    <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@c.Id" class="btn btn-danger btn-sm">Eliminar</a>
                 </td>
             </tr>
         }

@@ -1,8 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Http
+
 @{
     var userEmail = Context.Session.GetString("UserEmail");
-}
 
+    // CAPTURAMOS LA RUTA ACTUAL PARA LA LÓGICA DE VISUALIZACIÓN
+    var controllerActual = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var actionActual = ViewContext.RouteData.Values["Action"]?.ToString();
+
+    // Detectamos si el usuario está parado exactamente en la Landing Page comercial
+    bool esLandingPage = (controllerActual == "Home" && actionActual == "Index");
+}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,94 +20,96 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
-
 <body>
 
-    <!-- HEADER -->
-    <header class="d-flex justify-content-between align-items-center px-4 bg-dark text-white">
-        <div class="fw-bold fs-5">
-            The Consortium App
-        </div>
+    @if (!esLandingPage)
+    {
+        <header class="d-flex justify-content-between align-items-center px-4 bg-dark text-white" style="height: 60px;">
+            <div class="fw-bold fs-5">
+                The Consortium App
+            </div>
 
-        <div class="d-flex align-items-center gap-2">
-            @if (!string.IsNullOrEmpty(userEmail))
-            {
-                <span class="text-white-50 small">👤 @userEmail</span>
+            <div class="d-flex align-items-center gap-2">
+                @if (!string.IsNullOrEmpty(userEmail))
+                {
+                    <span class="text-white-50 small">👤 @userEmail</span>
 
-                <a class="btn btn-sm btn-danger"
-                   asp-controller="Account"
-                   asp-action="Logout">
-                    Cerrar sesión
-                </a>
-            }
-            else
-            {
-                <a class="btn btn-sm btn-outline-light"
-                   asp-controller="Account"
-                   asp-action="Login">
-                    Iniciar sesión
-                </a>
-            }
-        </div>
-    </header>
+                    <a class="btn btn-sm btn-danger"
+                       asp-controller="Account"
+                       asp-action="Logout">
+                        Cerrar sesión
+                    </a>
+                }
+                else
+                {
+                    <a class="btn btn-sm btn-outline-light"
+                       asp-controller="Account"
+                       asp-action="Login">
+                        Iniciar sesión
+                    </a>
+                }
+            </div>
+        </header>
+    }
 
     <div class="contenedor-principal d-flex">
 
-        <!-- SIDEBAR -->
-        <aside class="bg-dark" style="min-width:220px; min-height:100vh;">
-            <nav>
-
-                <a class="d-block p-3 text-white text-decoration-none"
-                   asp-controller="Home"
-                   asp-action="Index">
-                    🏠 Dashboard
-                </a>
-
-                <a class="d-block p-3 text-white text-decoration-none"
-                   asp-controller="Consorcio"
-                   asp-action="Index">
-                    🏢 Consorcios
-                </a>
-
-                <a class="d-block p-3 text-white text-decoration-none"
-                   asp-controller="UnidadFuncional"
-                   asp-action="Index">
-                    🏘️ Unidades
-                </a>
-
-                <a class="d-block p-3 text-white text-decoration-none"
-                   asp-controller="Gasto"
-                   asp-action="Index">
-                    💰 Gastos
-                </a>
-
-                <a class="d-block p-3 text-white text-decoration-none"
-                   asp-controller="Reportes"
-                   asp-action="Index">
-                    📊 Reportes
-                </a>
-
-                <!-- ✅ BOTÓN ADMIN -->
-                @if (userEmail == "admin@admin.com")
-                {
-                    <a class="d-block p-3 text-warning text-decoration-none"
-                       asp-controller="Admin"
-                       asp-action="Index">
-                        🛠 Admin
+        @if (!esLandingPage)
+        {
+            <aside class="bg-dark" style="min-width:220px; min-height: calc(100vh - 60px);">
+                <nav>
+                    <a class="d-block p-3 text-white text-decoration-none"
+                       asp-controller="Home"
+                       asp-action="Dashboard">
+                        🏠 Dashboard
                     </a>
-                }
-            </nav>
-        </aside>
 
-        <!-- MAIN -->
-        <main class="p-4 w-100">
+                    <a class="d-block p-3 text-white text-decoration-none"
+                       asp-controller="Consorcio"
+                       asp-action="Index">
+                        🏢 Consorcios
+                    </a>
+
+                    <a class="d-block p-3 text-white text-decoration-none"
+                       asp-controller="UnidadFuncional"
+                       asp-action="Index">
+                        🏘️ Unidades
+                    </a>
+
+                    <a class="d-block p-3 text-white text-decoration-none"
+                       asp-controller="Gasto"
+                       asp-action="Index">
+                        💰 Gastos
+                    </a>
+
+                    <a class="d-block p-3 text-white text-decoration-none"
+                       asp-controller="Reportes"
+                       asp-action="Index">
+                        📊 Reportes
+                    </a>
+
+                    @if (userEmail == "admin@admin.com")
+                    {
+                        <a class="d-block p-3 text-warning text-decoration-none"
+                           asp-controller="Admin"
+                           asp-action="Index">
+                            🛠 Admin
+                        </a>
+                    }
+                </nav>
+            </aside>
+        }
+
+        <main id="@(esLandingPage ? "" : "panel-administracion")" class="@(esLandingPage ? "p-0 w-100" : "p-4 w-100")">
             @RenderBody()
         </main>
+
     </div>
 
     <footer class="text-center p-3 bg-light">
-        © 2026 - Contreras & Asociados | Sistema de Gestión de Consorcios
+        © 2026 - Contreras &amp; Asociados | Sistema de Gestión de Consorcios
     </footer>
 
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,115 @@
+﻿@model IEnumerable<TheConsortiumApp.Models.UnidadFuncional>
+
+@{
+    ViewData["Title"] = "Unidades Funcionales";
+}
+
+<div class="card p-4 shadow-sm bg-white">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="m-0 fw-bold text-secondary">Gestión de Unidades Funcionales</h5>
+        <a asp-action="Create" class="btn btn-sm btn-primary">➕ Nueva Unidad</a>
+    </div>
+
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Nro. Unidad</th>
+                <th>Piso / Depto</th>
+                <th>Ambientes</th>
+                <th>Estado de Ocupación</th>
+                <th class="text-center">Contrato Base</th>
+                <th class="text-center" style="width: 280px;">Historial de Pagos Mensuales</th>
+                <th>Coeficiente</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.NroUnidad</strong></td>
+                    <td>@item.PisoDepto</td>
+                    <td>@item.Ambientes</td>
+                    <td>
+                        @if (item.EstaAlquilada)
+                        {
+                            <span class="badge bg-info text-dark mb-1">Alquilado</span>
+                            <div class="small text-muted">
+                                👤 Propietario le alquila a: <strong class="text-dark">@item.NombreInquilino</strong>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success mb-1">Habitado por Dueño</span>
+                            <div class="small text-muted">
+                                👤 Propietario no tiene alquilado: <strong class="text-dark">@item.NombrePropietario</strong>
+                            </div>
+                        }
+                    </td>
+
+                    <td class="text-center">
+                        @if (!string.IsNullOrEmpty(item.ArchivoContrato))
+                        {
+                            <a href="~/contratos/@item.ArchivoContrato" target="_blank" class="btn btn-sm btn-outline-primary" title="Ver Contrato Base">
+                                📄 Ver Contrato
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Sin contrato</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (item.ComprobantesPagos != null && item.ComprobantesPagos.Any())
+                        {
+                            <div style="max-height: 120px; overflow-y: auto;" class="border rounded p-2 bg-light">
+                                <table class="table table-sm table-borderless m-0" style="font-size: 12px;">
+                                    <tbody>
+                                        @foreach (var pago in item.ComprobantesPagos.OrderByDescending(p => p.Periodo))
+                                        {
+                                            <tr class="border-bottom">
+                                                <td class="p-1"><strong>@pago.Periodo</strong></td>
+                                                <td class="p-1 text-muted">📅 @pago.FechaPago.ToShortDateString()</td>
+                                                <td class="p-1 text-end">
+                                                    @if (!string.IsNullOrEmpty(pago.ArchivoAlquiler))
+                                                    {
+                                                        <a href="~/comprobantes_mensuales/@pago.ArchivoAlquiler" target="_blank" class="text-decoration-none me-1" title="Ticket Alquiler">🏠</a>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(pago.ArchivoExpensas))
+                                                    {
+                                                        <a href="~/comprobantes_mensuales/@pago.ArchivoExpensas" target="_blank" class="text-decoration-none" title="Ticket Expensas">💰</a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted small py-2"><i>Sin pagos registrados</i></div>
+                        }
+                    </td>
+
+                    <td>@item.Coeficiente %</td>
+
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <a asp-action="CargarPago" asp-route-id="@item.Id" class="btn btn-sm btn-success d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cargar Pago Mensual">
+                                $
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Gestionar Alquiler">
+                                ✏️
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" onclick="return confirm('¿Está seguro?');" title="Eliminar">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

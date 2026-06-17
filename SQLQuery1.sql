@@ -1,0 +1,1 @@
+﻿UPDATE Gastos SET UsuarioId = NULL;
